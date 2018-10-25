@@ -28,20 +28,51 @@ public class State {
 		return label;
 	}
 	
-	public void addTransition(String nextState, char tapeRead, String stackRead, String stackWrite, String label) {
+//	public void setLabel(String label) {
+//		this.label =  label;
+//	}
+	
+	public void addTransition(String nextState, Character tapeRead, String stackRead, String[] stackWrite, int label) {
 		this.transitions.add(new Transition(nextState, tapeRead, stackRead, stackWrite, label));
 	}
 	
-	public ArrayList<Transition> getTransitions(char tapeRead, String stackRead){
+	public ArrayList<Transition> getTransitions(Character tapeRead, String stackRead){
 		ArrayList<Transition> output = new ArrayList<Transition>();
 		
 		for(int i = 0; i < this.transitions.size(); i++)
-			if((tapeRead == this.transitions.get(i).getTapeRead() || this.transitions.get(i).getTapeRead() == FALTA PONER ESTA CONSTANTE) && stackRead == this.transitions.get(i).getStackRead())
+			if((this.transitions.get(i).getTapeRead().equals(tapeRead) || this.transitions.get(i).getTapeRead().equals(AP.EPSYLON_SYMBOL)) && this.transitions.get(i).getStackRead().equals(stackRead))
 				output.add(this.transitions.get(i));
 		
 		return output;
 	}
 	
-	
-	
+	@Override
+	public String toString() {
+		String output = this.label + ":\n";
+		for(int i = 0; i < transitions.size(); i++)
+			output += "\t\t\t" + transitions.get(i) + "\n";
+		return output;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		State other = (State) obj;
+		if (label == null) {
+			if (other.label != null)
+				return false;
+		} else if (!label.equals(other.label))
+			return false;
+		if (transitions == null) {
+			if (other.transitions != null)
+				return false;
+		} else if (!transitions.equals(other.transitions))
+			return false;
+		return true;
+	}
 }
