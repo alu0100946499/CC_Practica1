@@ -5,7 +5,7 @@ import java.util.Stack;
 public class APMemory {
 	String word;
 	Stack<String> stack;
-	
+
 	/**
 	 * @param word
 	 * @param stack
@@ -28,5 +28,5 @@ public class APMemory {
 	public Stack<String> getStack() {
 		return (Stack<String>) stack.clone();
 	}
-	
+
 }
