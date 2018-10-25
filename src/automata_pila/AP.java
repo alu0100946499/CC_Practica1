@@ -123,7 +123,10 @@ public class AP {
 		output += "\tFinal States: [";
 		for(int i = 0; i < this.finalStates.size() - 1; i++)
 			output += this.finalStates.get(i).getLabel() + ",";
-		output += this.finalStates.get(this.finalStates.size()-1).getLabel() + "]\n";
+		if(this.finalStates.size() == 0)
+			output += "]\n";
+		else
+			output += this.finalStates.get(this.finalStates.size()-1).getLabel() + "]\n";
 		output += "\tStack: " + this.stack + "\n\n";
 		
 		return output;
@@ -172,9 +175,13 @@ public class AP {
 	
 	
 	public void drawInstant(ArrayList<Transition> moves) {
-		ArrayList<Integer> transitionLabels = new ArrayList<Integer>();
+		ArrayList<String> transitionLabels = new ArrayList<String>();
 		for(int i = 0; i < moves.size(); i++)
-			transitionLabels.add(moves.get(i).getLabel());
+			if(i == 0)
+				transitionLabels.add(moves.get(i).getLabel() + "*");
+			else
+				transitionLabels.add(moves.get(i).getLabel() + "");
+		
 		System.out.printf("|%-10s|%-20s|%-30s|%-20s|\n", this.actualState.getLabel(), this.word, this.stack, transitionLabels);
 	}
 	
@@ -247,7 +254,5 @@ public class AP {
 			this.states.add(new State(state[i]));
 		}
 	}
-	
-	
 
 }
