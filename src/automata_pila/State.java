@@ -2,40 +2,55 @@ package automata_pila;
 
 import java.util.ArrayList;
 
+/**
+ * This class represents a state for a Pushdown automaton.
+ * @author Javier Esteban Pérez Rivas (alu0100946499@ull.edu.es)
+ *
+ */
 public class State {
 
 	private String label;
 	private ArrayList<Transition> transitions;
+	
 	/**
-	 * @param label
-	 * @param transitions
+	 * @param label Name of the State
+	 * @param transitions Set of transitions
 	 */
 	public State(String label, ArrayList<Transition> transitions) {
 		this.label = label;
 		this.transitions = transitions;
 	}
-	/**
-	 * @param label
-	 */
+
+	
 	public State(String label) {
 		this.label = label;
 		this.transitions = new ArrayList<Transition>();
 	}
-	/**
-	 * @return the label
-	 */
+
+	
 	public String getLabel() {
 		return label;
 	}
 	
-//	public void setLabel(String label) {
-//		this.label =  label;
-//	}
 	
+	/**
+	 * Add a new transition to the transition's set
+	 * @param nextState 
+	 * @param tapeRead Symbol that is read from the input tape.
+	 * @param stackRead Symbol that is read from the stack
+	 * @param stackWrite Symbol or symbols that will be written in the stack
+	 * @param label This value is use to enumerate the transitions. The order is based on how the transitions were at the specification file.
+	 */
 	public void addTransition(String nextState, Character tapeRead, String stackRead, String[] stackWrite, int label) {
 		this.transitions.add(new Transition(nextState, tapeRead, stackRead, stackWrite, label));
 	}
 	
+	/**
+	 * Return all the possibles moves with the values specified.
+	 * @param tapeRead First symbol of the currently word.
+	 * @param stackRead First symbol of the stack.
+	 * @return
+	 */
 	public ArrayList<Transition> getTransitions(Character tapeRead, String stackRead){
 		ArrayList<Transition> output = new ArrayList<Transition>();
 		

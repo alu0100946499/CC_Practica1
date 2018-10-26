@@ -5,7 +5,6 @@ p q
 0 1 S
 p
 S
-
 p 0 S p 0 S
 p 1 S p 1 S
 p 0 0 p 0 0

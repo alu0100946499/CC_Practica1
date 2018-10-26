@@ -7,32 +7,37 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Stack;
 
+/**
+ * This class represents a Pushdown automaton.
+ * @author Javier Esteban Pérez Rivas (alu0100946499@ull.edu.es)
+ *
+ */
 public class AP {
 	
-	private static final String COMMENTARY_REGEX = "\\s*#.*";
-
-	private static final String WHITE_SPACES_REGEX = "\\s+";
-	
+	private static final String COMMENTARY_REGEX = "\\s*#.*"; //Regex used to remove the comentaries
+	private static final String WHITE_SPACES_REGEX = "\\s+"; //Regex used to detec white spaces
 	public static final Character EPSYLON_SYMBOL = '.';
 	
 	private String word;
-	private ArrayList<State> states = null;
-	private ArrayList<String> sigma = null;
-	private ArrayList<String> gamma = null;
-	private State actualState;
-	private String firstStack;
-	private ArrayList<State> finalStates = null;
+	private ArrayList<State> states = null; //Set of states
+	private ArrayList<String> sigma = null; //Input alphabet
+	private ArrayList<String> gamma = null; //Stack alphaber
+	private State actualState; 
+	private String firstStack; //Symbol that is at the stack when the AP is initialized
+	private ArrayList<State> finalStates = null; 
 	private Stack<String> stack = null;
-	private Stack<APMemory> memoryStack = null;
+	private Stack<APMemory> memoryStack = null; //Stack that store the situation of the AP in a certain instant
 	private Boolean mode; // If True, final state AP, else, stack emptying AP.
-	private Boolean trace; 
+	private Boolean trace; // True if the trace must be shown
 
-	public AP(String filename, String word, Integer trace) {
-		if(trace == 0)
-			this.trace = false;
-		else
-			this.trace = true;
-		this.word = word;
+	/**
+	 * @param filename File where the AP is defined.
+	 * @param mode  True, final state AP, else, stack emptying AP.
+	 */
+	public AP(String filename, Boolean mode) {
+		this.word = "";
+		this.mode = mode;
+		this.trace = false;
 		this.states = new ArrayList<State>();
 		this.sigma = new ArrayList<String>();
 		this.gamma = new ArrayList<String>();
@@ -72,9 +77,10 @@ public class AP {
 				throw new IOException("First stack symbol is not in the stack alphabet");
 			}
 			
+			if(mode) {
+				genererateFinalStates(reader.readLine().replaceAll(COMMENTARY_REGEX, "").split(WHITE_SPACES_REGEX));
+			}
 			
-			this.mode = genererateFinalStates(reader.readLine().replaceAll(COMMENTARY_REGEX, "").split(WHITE_SPACES_REGEX));
-				
 			
 			int counter = 1;
 			while(reader.ready()) {
@@ -95,13 +101,34 @@ public class AP {
 			reader.close();
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-			System.out.println("Error al abrir el fichero " + e.getMessage());
+			System.out.println("" + e.getMessage());
 		} catch (IOException e) {
 			e.printStackTrace();
-			System.out.println("Error al leer del fichero " + e.getMessage());
+			System.out.println("Error opening the file. " + e.getMessage());
 			
 		}
 	}
+	
+	
+	public String getWord() {
+		return word;
+	}
+
+
+	public void setWord(String word) {
+		this.word = word;
+	}
+
+	
+	public Boolean getTrace() {
+		return trace;
+	}
+
+
+	public void setTrace(Boolean trace) {
+		this.trace = trace;
+	}
+
 	
 	@Override
 	public String toString() {
@@ -133,6 +160,10 @@ public class AP {
 	}
 
 	
+	/**
+	 * Recursive function that checks if the current word belongs to the AP's language.
+	 * @return True if a successful way was found.
+	 */
 	public Boolean compute() {
 		if(this.word.length() == 0) {
 			if(mode && inFinalStates(this.actualState))
@@ -145,7 +176,7 @@ public class AP {
 		if(this.stack.empty())
 			return false;
 		else {
-			this.memoryStack.push(new APMemory(this.word, this.stack)); // NO SE BIEN DONDE VA (tengo que hacer uno antes para guardar la situacion inicial)
+			this.memoryStack.push(new APMemory(this.word, this.stack, this.actualState)); // NO SE BIEN DONDE VA (tengo que hacer uno antes para guardar la situacion inicial)
 			ArrayList<Transition> moves = new ArrayList<Transition>();
 			if(this.word.length() > 0)
 				moves = this.actualState.getTransitions(this.word.charAt(0), this.stack.peek());
@@ -174,6 +205,10 @@ public class AP {
 	}
 	
 	
+	/**
+	 * It is used for the trace. Show the current situation of the AP and the possible moves it can do.
+	 * @param moves Possible moves
+	 */
 	public void drawInstant(ArrayList<Transition> moves) {
 		ArrayList<String> transitionLabels = new ArrayList<String>();
 		for(int i = 0; i < moves.size(); i++)
@@ -186,11 +221,18 @@ public class AP {
 	}
 	
 	
+	/**
+	 * Draw a header for the trace
+	 */
 	public void drawHeader() {
 		System.out.printf("|%-10s|%-20s|%-30s|%-20s|\n\n", "State", "Word", "Stack", "Transitions");
 	}
 
 	
+	/**
+	 * Change the values of the AP using a transition.
+	 * @param transition 
+	 */
 	private void update(Transition transition) {
 		if(!transition.getTapeRead().equals(EPSYLON_SYMBOL))
 			this.word = this.word.substring(1);
@@ -201,11 +243,21 @@ public class AP {
 	}
 	
 	
+	/**
+	 * Restore the AP to the instant that is at the top of the stack
+	 */
 	private void restore() {
 		this.word = this.memoryStack.peek().getWord();
 		this.stack = this.memoryStack.peek().getStack();
+		this.actualState = this.memoryStack.peek().getActualState();
 	}
 
+	
+	/**
+	 * Check if a state is in the FinalStates set
+	 * @param state
+	 * @return
+	 */
 	private Boolean inFinalStates(State state) {
 		for(int i = 0; i < this.finalStates.size(); i++)
 			if(this.finalStates.get(i).equals(state))
@@ -214,6 +266,11 @@ public class AP {
 	}
 
 	
+	/**
+	 * Check if a state label match with any state in the states set
+	 * @param state
+	 * @return
+	 */
 	private int inStates(String state) {
 		for(int i = 0; i < this.states.size(); i++)
 			if(this.states.get(i).getLabel().equals(state))
@@ -221,19 +278,19 @@ public class AP {
 		return -1;
 	}
 
-	private Boolean genererateFinalStates(String[] states) throws IOException {
-		if(!states[0].equals("")) {
-			for(int i = 0; i < states.length; i++) {
-				int index = inStates(states[i]);
+	
+	private void genererateFinalStates(String[] split) throws IOException {
+		if(!split[0].equals("")) {
+			for(int i = 0; i < split.length; i++) {
+				int index = inStates(split[i]);
 				if(index != -1)
 					this.finalStates.add(this.states.get(index));
 				else
 					throw new IOException("Final states are wrong defined");
 			}
-			return true;
 		}
 		else
-			return false;
+			throw new IOException("Final states are wrong defined");
 	}
 
 	
@@ -249,9 +306,9 @@ public class AP {
 	}
 
 	
-	private void generateStates(String[] state) {
-		for(int i = 0; i < state.length; i++) {
-			this.states.add(new State(state[i]));
+	private void generateStates(String[] split) {
+		for(int i = 0; i < split.length; i++) {
+			this.states.add(new State(split[i]));
 		}
 	}
 

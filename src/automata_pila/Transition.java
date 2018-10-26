@@ -2,20 +2,25 @@ package automata_pila;
 
 import java.util.Arrays;
 
+/**
+ * This class represents a transition for a Pushdown automaton.
+ * @author Javier Esteban Pérez Rivas (alu0100946499@ull.edu.es)
+ *
+ */
 public class Transition {
 
-	private String nextState;
+	private String nextState; 
 	private Character tapeRead;
 	private String stackRead;
 	private String[] stackWrite;
 	private int label;
 	
 	/**
-	 * @param nextState
-	 * @param tapeRead
-	 * @param stackRead
-	 * @param stackWrite
-	 * @param label
+	 * @param nextState 
+	 * @param tapeRead Symbol that is read from the input tape.
+	 * @param stackRead Symbol that is read from the stack
+	 * @param stackWrite Symbol or symbols that will be written in the stack
+	 * @param label This value is use to enumerate the transitions. The order is based on how the transitions were at the specification file.
 	 */
 	public Transition(String nextState, Character tapeRead, String stackRead, String[] stackWrite, int label) {
 		this.nextState = nextState;
@@ -25,41 +30,32 @@ public class Transition {
 		this.label = label;
 	}
 
-	/**
-	 * @return the nextState
-	 */
+
 	public String getNextState() {
 		return nextState;
 	}
 
-	/**
-	 * @return the tapeRead
-	 */
+
 	public Character getTapeRead() {
 		return tapeRead;
 	}
 
-	/**
-	 * @return the stackRead
-	 */
+
 	public String getStackRead() {
 		return stackRead;
 	}
 
-	/**
-	 * @return the stackWrite
-	 */
+	
 	public String[] getStackWrite() {
 		return stackWrite;
 	}
 
-	/**
-	 * @return the label
-	 */
+
 	public int getLabel() {
 		return label;
 	}
 
+	
 	@Override
 	public String toString() {
 		String output = "(" + this.nextState + ", " + this.tapeRead + ", " + this.stackRead + ", ";
